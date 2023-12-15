@@ -2,6 +2,7 @@ package com.github.zkkv;
 
 import com.github.zkkv.controllers.GUIController;
 import com.github.zkkv.services.GUIService;
+import com.github.zkkv.services.ScriptRunner;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -18,13 +19,16 @@ public class EntryPoint extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        /*SharedConstants constants = new SharedConstants("src/main/java/com/github/zkkv/", "script.kts");
-        ScriptRunner scriptRunner = new ScriptRunner(constants);
-        scriptRunner.executeScript();*/
-
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/mainScene.fxml"));
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root);
+
+        SharedConstants constants = new SharedConstants("src/main/java/com/github/zkkv/", "script.kts");
+        GUIController controller = (GUIController) fxmlLoader.getController();
+        controller.setConstants(constants);
+        controller.setService(new GUIService());
+        controller.setScriptRunner(new ScriptRunner());
+
         primaryStage.setScene(scene);
         primaryStage.show();
     }
