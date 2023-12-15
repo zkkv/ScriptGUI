@@ -30,6 +30,8 @@ dependencies {
 
     implementation(kotlin("scripting-jsr223"))
     implementation(kotlin("script-runtime"))
+
+    implementation("org.fxmisc.richtext:richtextfx:0.11.2")
 }
 
 tasks.getByName<Test>("test") {
