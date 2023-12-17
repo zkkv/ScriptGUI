@@ -42,7 +42,7 @@ public class EntryPoint extends Application {
         ScriptRunner scriptRunner = new ScriptRunner(scriptingStrategy);
 
         String scriptName = "script";
-        String scriptPath = "src/main/java/com/github/zkkv/" + scriptName
+        String scriptPath = "src/main/java/com/github/zkkv/scripts/" + scriptName
                 + "." + scriptingStrategy.extension();
         GUIController controller = fxmlLoader.getController();
         controller.setConstants(scriptPath);
