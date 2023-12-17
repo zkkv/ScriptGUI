@@ -95,7 +95,7 @@ public class GUIController {
         this.scriptRunner = scriptRunner;
     }
 
-    public void setConstants(String scriptPath) {
+    public void setScriptPath(String scriptPath) {
         this.scriptPath = scriptPath;
     }
 
