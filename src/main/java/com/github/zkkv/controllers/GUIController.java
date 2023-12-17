@@ -126,6 +126,8 @@ public class GUIController {
         // Block editing while the code is running
         inputArea.setEditable(false);
 
+        runButton.setDisable(true);
+
         // Clean VBox from previous errors
         errorVBox.getChildren().clear();
 
@@ -140,6 +142,7 @@ public class GUIController {
             errorCodeLabel.setText("Something went wrong when trying to write to ."
                     + scriptingStrategy.extension() + "file");
             inputArea.setEditable(true);
+            runButton.setDisable(false);
             return;
         }
 
@@ -151,6 +154,7 @@ public class GUIController {
             errorCodeLabel.setText("Something went wrong when trying to write to ."
                     + scriptingStrategy.extension() + "file");
             inputArea.setEditable(true);
+            runButton.setDisable(false);
             return;
         }
 
@@ -167,19 +171,21 @@ public class GUIController {
                 return scriptRunner.executeScript(script);
             }
         };
-
+        
         // Set up event handler for when the Task is finished.
         // This is executed on JavaFX thread, unlike call().
         scriptTask.setOnSucceeded((WorkerStateEvent event) -> {
             Object result = scriptTask.getValue();
             handleSuccessfulExecution(result);
             inputArea.setEditable(true);
+            runButton.setDisable(false);
         });
 
         scriptTask.setOnFailed((WorkerStateEvent event) -> {
             String[] errorLines = event.getSource().getException().getMessage().split("\n");
             handleScriptErrors(errorLines);
             inputArea.setEditable(true);
+            runButton.setDisable(false);
         });
 
         EXECUTOR.submit(scriptTask);
@@ -233,12 +239,7 @@ public class GUIController {
 
         @Override
         public void write(int b) throws IOException {
-            this.appendText(String.valueOf((char)b));
+            Platform.runLater(() -> outputArea.appendText(String.valueOf((char)b)));
         }
-
-        public void appendText(final String text) {
-            Platform.runLater(() -> outputArea.appendText(text));
-        }
-
     }
 }
