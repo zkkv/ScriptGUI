@@ -8,6 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
 
 import javax.script.ScriptException;
 import java.io.IOException;
@@ -48,7 +49,14 @@ public class GUIController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        outputArea.setEditable(false);
+        outputArea.setWrapText(false);
 
+        errorArea.setEditable(false);
+
+        inputArea.setParagraphGraphicFactory(LineNumberFactory.get(inputArea));
+        inputArea.setEditable(true);
+        inputArea.setWrapText(false);
     }
 
     public void setService(GUIService service) {
@@ -89,6 +97,7 @@ public class GUIController implements Initializable {
             System.err.println("Something went wrong when trying to read from .kts file.");
         } catch (ScriptException e) {
             e.printStackTrace();
+            System.out.println(e.getMessage());
             errorArea.replaceText(0, errorArea.getLength(), e.getMessage());
             System.err.println("Something went wrong when executing the script.");
         }

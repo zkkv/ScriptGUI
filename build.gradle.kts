@@ -34,6 +34,15 @@ dependencies {
     implementation("org.fxmisc.richtext:richtextfx:0.11.2")
 }
 
+sourceSets {
+    main {
+        java {
+            exclude("**/*.kts")
+        }
+    }
+}
+
+
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
 }

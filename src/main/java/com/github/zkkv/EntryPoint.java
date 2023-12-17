@@ -9,8 +9,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.util.Objects;
-
 public class EntryPoint extends Application {
 
     public static void main(String[] args) {
@@ -24,7 +22,7 @@ public class EntryPoint extends Application {
         Scene scene = new Scene(root);
 
         SharedConstants constants = new SharedConstants("src/main/java/com/github/zkkv/", "script.kts");
-        GUIController controller = (GUIController) fxmlLoader.getController();
+        GUIController controller = fxmlLoader.getController();
         controller.setConstants(constants);
         controller.setService(new GUIService());
         controller.setScriptRunner(new ScriptRunner());
