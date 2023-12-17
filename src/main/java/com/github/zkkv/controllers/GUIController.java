@@ -46,7 +46,7 @@ public class GUIController {
     private CodeArea inputArea;
 
     @FXML
-    private CodeArea outputArea;
+    private TextArea outputArea;
 
     @FXML
     private VBox errorVBox;
