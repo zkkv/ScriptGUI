@@ -5,9 +5,7 @@ import com.github.zkkv.services.GUIService;
 import com.github.zkkv.services.ScriptRunner;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -28,6 +26,12 @@ public class GUIController implements Initializable {
     private ScriptRunner scriptRunner;
 
     private SharedConstants constants;
+
+    @FXML
+    private SplitPane mainSplitPane;
+
+    @FXML
+    private SplitPane outputSplitPane;
 
     @FXML
     private CodeArea inputArea;
@@ -59,6 +63,23 @@ public class GUIController implements Initializable {
         inputArea.setParagraphGraphicFactory(LineNumberFactory.get(inputArea));
         inputArea.setEditable(true);
         inputArea.setWrapText(false);
+
+        // Restrict min and max values for the divider in SplitPane
+        mainSplitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.doubleValue() < 0.2) {
+                mainSplitPane.getDividers().get(0).setPosition(0.2);
+            } else if (newValue.doubleValue() > 0.8) {
+                mainSplitPane.getDividers().get(0).setPosition(0.8);
+            }
+        });
+
+        outputSplitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.doubleValue() < 0.2) {
+                outputSplitPane.getDividers().get(0).setPosition(0.2);
+            } else if (newValue.doubleValue() > 0.8) {
+                outputSplitPane.getDividers().get(0).setPosition(0.8);
+            }
+        });
     }
 
     public void setService(GUIService service) {
