@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 
@@ -63,6 +64,7 @@ public class GUIController implements Initializable {
         inputArea.setParagraphGraphicFactory(LineNumberFactory.get(inputArea));
         inputArea.setEditable(true);
         inputArea.setWrapText(false);
+        inputArea.replaceText(0, outputArea.getLength(), "var example = 42 * 3\nexample");
 
         // Restrict min and max values for the divider in SplitPane
         mainSplitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) -> {
@@ -105,9 +107,9 @@ public class GUIController implements Initializable {
         try {
             service.saveCodeToFile(filepath, inputArea.getText());
         } catch (IOException e) {
-            // TODO: Handle the exception nicely
-            e.printStackTrace();
-            System.err.println("Something went wrong when trying to write to .kts file.");
+            errorCodeLabel.setTextFill(Color.RED);
+            errorCodeLabel.setText("Something went wrong when trying to write to .kts file");
+            inputArea.setEditable(true);
             return;
         }
 
@@ -115,26 +117,31 @@ public class GUIController implements Initializable {
         try {
             script = service.readCodeFromFile(filepath);
         } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Something went wrong when trying to read from .kts file.");
+            errorCodeLabel.setTextFill(Color.RED);
+            errorCodeLabel.setText("Something went wrong when trying to write to .kts file");
+            inputArea.setEditable(true);
             return;
         }
 
         runningLabel.setText("Running the script");
         try {
             Object result = scriptRunner.executeScript(script);
-            runningLabel.setText("Execution has finished");
-            if (result != null) {
-                outputArea.replaceText(0, outputArea.getLength(), result.toString());
-            }
+            handleSuccessfulExecution(result);
         } catch (ScriptException e) {
-            e.printStackTrace();
             String[] errorLines = e.getMessage().split(System.lineSeparator());
             handleScriptErrors(errorLines);
         }
-
         // Unblock editing
         inputArea.setEditable(true);
+    }
+
+    private void handleSuccessfulExecution(Object result) {
+        runningLabel.setText("Execution has finished successfully");
+        errorCodeLabel.setTextFill(Color.BLACK);
+        errorCodeLabel.setText("Exit code: 0");
+        if (result != null) {
+            outputArea.replaceText(0, outputArea.getLength(), result.toString());
+        }
     }
 
     private void handleScriptErrors(final String[] errorLines) {
@@ -156,6 +163,8 @@ public class GUIController implements Initializable {
                 errorVBox.getChildren().add(linkToError);
             }
         }
-        System.err.println("Something went wrong when executing the script.");
+        errorCodeLabel.setTextFill(Color.RED);
+        errorCodeLabel.setText("Error with script execution");
+        runningLabel.setText("Execution has finished with errors");
     }
 }
