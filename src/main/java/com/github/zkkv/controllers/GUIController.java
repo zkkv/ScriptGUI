@@ -1,27 +1,19 @@
 package com.github.zkkv.controllers;
 
-import com.github.zkkv.SharedConstants;
 import com.github.zkkv.services.GUIService;
 import com.github.zkkv.services.ScriptRunner;
 import com.github.zkkv.strategies.ScriptingStrategy;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.stage.Stage;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 
 import javax.script.ScriptException;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ResourceBundle;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Controls the only scene in the application.
@@ -32,7 +24,7 @@ public class GUIController {
 
     private ScriptRunner scriptRunner;
 
-    private SharedConstants constants;
+    private String scriptPath;
 
     private ScriptingStrategy scriptingStrategy;
 
@@ -103,8 +95,8 @@ public class GUIController {
         this.scriptRunner = scriptRunner;
     }
 
-    public void setConstants(SharedConstants constants) {
-        this.constants = constants;
+    public void setConstants(String scriptPath) {
+        this.scriptPath = scriptPath;
     }
 
     public void setScriptingStrategy(ScriptingStrategy scriptingStrategy) {
@@ -122,9 +114,9 @@ public class GUIController {
         // Clean VBox from previous errors
         errorVBox.getChildren().clear();
 
-        Path filepath = Paths.get(constants.relativeScriptPath() + constants.scriptName());
+        Path filePath = Paths.get(scriptPath);
         try {
-            service.saveCodeToFile(filepath, inputArea.getText());
+            service.saveCodeToFile(filePath, inputArea.getText());
         } catch (IOException e) {
             errorCodeLabel.setTextFill(Color.RED);
             errorCodeLabel.setText("Something went wrong when trying to write to ."
@@ -135,7 +127,7 @@ public class GUIController {
 
         String script;
         try {
-            script = service.readCodeFromFile(filepath);
+            script = service.readCodeFromFile(filePath);
         } catch (IOException e) {
             errorCodeLabel.setTextFill(Color.RED);
             errorCodeLabel.setText("Something went wrong when trying to write to ."

@@ -41,9 +41,11 @@ public class EntryPoint extends Application {
         GUIService service = new GUIService();
         ScriptRunner scriptRunner = new ScriptRunner(scriptingStrategy);
 
-        SharedConstants constants = new SharedConstants("src/main/java/com/github/zkkv/", "script.kts");
+        String scriptName = "script";
+        String scriptPath = "src/main/java/com/github/zkkv/" + scriptName
+                + "." + scriptingStrategy.extension();
         GUIController controller = fxmlLoader.getController();
-        controller.setConstants(constants);
+        controller.setConstants(scriptPath);
         controller.setService(service);
         controller.setScriptRunner(scriptRunner);
         controller.setScriptingStrategy(scriptingStrategy);
