@@ -9,6 +9,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class EntryPoint extends Application {
@@ -58,6 +59,10 @@ public class EntryPoint extends Application {
         primaryStage.setMinHeight(500);
         primaryStage.setTitle(scriptingStrategy.languageName() + ": Script Runner GUI");
         primaryStage.setOnCloseRequest(event -> controller.shutdownThreads());
+        primaryStage.getIcons().add(new Image("file:src/main/resources/img/icon16.png"));
+        primaryStage.getIcons().add(new Image("file:src/main/resources/img/icon32.png"));
+        primaryStage.getIcons().add(new Image("file:src/main/resources/img/icon64.png"));
+        primaryStage.getIcons().add(new Image("file:src/main/resources/img/icon128.png"));
         primaryStage.show();
     }
 }
