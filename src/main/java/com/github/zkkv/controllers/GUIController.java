@@ -8,6 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 
@@ -60,11 +61,12 @@ public class GUIController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         outputArea.setEditable(false);
         outputArea.setWrapText(false);
+        outputArea.replaceText(0, outputArea.getLength(), "Output will appear here");
 
         inputArea.setParagraphGraphicFactory(LineNumberFactory.get(inputArea));
         inputArea.setEditable(true);
         inputArea.setWrapText(false);
-        inputArea.replaceText(0, outputArea.getLength(), "var example = 42 * 3\nexample");
+        inputArea.replaceText(0, inputArea.getLength(), "var example = 42 * 3\nexample");
 
         // Restrict min and max values for the divider in SplitPane
         mainSplitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) -> {
@@ -128,7 +130,7 @@ public class GUIController implements Initializable {
             Object result = scriptRunner.executeScript(script);
             handleSuccessfulExecution(result);
         } catch (ScriptException e) {
-            String[] errorLines = e.getMessage().split(System.lineSeparator());
+            String[] errorLines = e.getMessage().split("\n");
             handleScriptErrors(errorLines);
         }
         // Unblock editing
@@ -155,16 +157,18 @@ public class GUIController implements Initializable {
                 // Add hyperlink with error to the VBox
                 Hyperlink linkToError = new Hyperlink();
                 linkToError.setText(errorLine);
+                linkToError.setTextFill(Color.RED);
                 linkToError.setOnAction(event -> {
                     inputArea.requestFocus();
                     inputArea.moveTo(lineNumber - 1, cursorPosition);
                     inputArea.requestFollowCaret();
+                    linkToError.setVisited(false);
                 });
                 errorVBox.getChildren().add(linkToError);
             }
         }
         errorCodeLabel.setTextFill(Color.RED);
-        errorCodeLabel.setText("Error with script execution");
-        runningLabel.setText("Execution has finished with errors");
+        errorCodeLabel.setText("Error(s) with script execution");
+        runningLabel.setText("Execution has finished with error(s)");
     }
 }

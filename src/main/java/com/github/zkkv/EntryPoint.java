@@ -26,10 +26,10 @@ public class EntryPoint extends Application {
         controller.setConstants(constants);
         controller.setService(new GUIService());
         controller.setScriptRunner(new ScriptRunner());
-        
+
         primaryStage.setScene(scene);
-        primaryStage.setWidth(620);
-        primaryStage.setHeight(500);
+        primaryStage.setWidth(800);
+        primaryStage.setHeight(600);
         primaryStage.setMinWidth(620);
         primaryStage.setMinHeight(500);
         primaryStage.show();
