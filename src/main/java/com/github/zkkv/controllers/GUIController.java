@@ -32,6 +32,8 @@ public class GUIController {
 
     private ScriptingStrategy scriptingStrategy;
 
+    private Task<Object> scriptTask;
+
     // Multithreading
     private final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
 
@@ -52,6 +54,9 @@ public class GUIController {
 
     @FXML
     private Button runButton;
+
+    @FXML
+    private Button abortButton;
 
     @FXML
     private Label runningLabel;
@@ -83,6 +88,9 @@ public class GUIController {
         inputArea.setEditable(true);
         inputArea.setWrapText(false);
         inputArea.replaceText(0, inputArea.getLength(), scriptingStrategy.exampleSnippet());
+
+        runButton.setDisable(false);
+        abortButton.setDisable(true);
 
         // Restrict min and max values for the divider in SplitPane
         mainSplitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) -> {
@@ -123,16 +131,7 @@ public class GUIController {
      * Script is saved and executed, and the interface is updated accordingly.
      */
     public void run() {
-        // Block editing while the code is running
-        inputArea.setEditable(false);
-
-        runButton.setDisable(true);
-
-        // Clean VBox from previous errors
-        errorVBox.getChildren().clear();
-
-        // Clean outputStream from previous results
-        outputArea.clear();
+        executeOnRunStart();
 
         Path filePath = Paths.get(scriptPath);
         try {
@@ -141,8 +140,7 @@ public class GUIController {
             errorCodeLabel.setTextFill(Color.RED);
             errorCodeLabel.setText("Something went wrong when trying to write to ."
                     + scriptingStrategy.extension() + "file");
-            inputArea.setEditable(true);
-            runButton.setDisable(false);
+            executeOnRunFinish();
             return;
         }
 
@@ -153,42 +151,57 @@ public class GUIController {
             errorCodeLabel.setTextFill(Color.RED);
             errorCodeLabel.setText("Something went wrong when trying to write to ."
                     + scriptingStrategy.extension() + "file");
-            inputArea.setEditable(true);
-            runButton.setDisable(false);
+            executeOnRunFinish();
             return;
         }
 
-        executeScriptOnDedicatedThread(script);
+        runningLabel.setText("Running the script (editing is disabled)");
+        EXECUTOR.submit(initializeScriptTask(script));
     }
 
-    private void executeScriptOnDedicatedThread(final String script) {
-        runningLabel.setText("Running the script");
-
+    private Task<Object> initializeScriptTask(final String script) {
         // Create a Task to run the script on the background (not JavaFX) thread
-        Task<Object> scriptTask = new Task<>() {
+        scriptTask = new Task<>() {
             @Override
             protected Object call() throws Exception {
                 return scriptRunner.executeScript(script);
             }
         };
-        
+
         // Set up event handler for when the Task is finished.
         // This is executed on JavaFX thread, unlike call().
         scriptTask.setOnSucceeded((WorkerStateEvent event) -> {
             Object result = scriptTask.getValue();
             handleSuccessfulExecution(result);
-            inputArea.setEditable(true);
-            runButton.setDisable(false);
+            executeOnRunFinish();
         });
 
         scriptTask.setOnFailed((WorkerStateEvent event) -> {
             String[] errorLines = event.getSource().getException().getMessage().split("\n");
             handleScriptErrors(errorLines);
-            inputArea.setEditable(true);
-            runButton.setDisable(false);
+            executeOnRunFinish();
         });
 
-        EXECUTOR.submit(scriptTask);
+        return scriptTask;
+    }
+
+    private void executeOnRunStart() {
+        // Block editing while the code is running
+        inputArea.setEditable(false);
+        runButton.setDisable(true);
+        abortButton.setDisable(false);
+
+        // Clean VBox from previous errors
+        errorVBox.getChildren().clear();
+
+        // Clean outputStream from previous results
+        outputArea.clear();
+    }
+
+    private void executeOnRunFinish() {
+        inputArea.setEditable(true);
+        runButton.setDisable(false);
+        abortButton.setDisable(true);
     }
 
     private void handleSuccessfulExecution(final Object result) {
@@ -221,6 +234,14 @@ public class GUIController {
         errorCodeLabel.setTextFill(Color.RED);
         errorCodeLabel.setText("Error(s) with script execution");
         runningLabel.setText("Execution has finished with error(s)");
+    }
+
+    public void abort() {
+        scriptTask.cancel();
+        inputArea.setEditable(true);
+        abortButton.setDisable(true);
+        runButton.setDisable(false);
+        runningLabel.setText("Execution was aborted");
     }
 
     /**
