@@ -3,6 +3,7 @@ package com.github.zkkv.controllers;
 import com.github.zkkv.services.GUIService;
 import com.github.zkkv.services.ScriptRunner;
 import com.github.zkkv.strategies.ScriptingStrategy;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
@@ -12,7 +13,7 @@ import javafx.scene.paint.Color;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
@@ -60,6 +61,14 @@ public class GUIController {
 
     public GUIController() {
 
+    }
+
+    public void setOutputStreamToGUI() {
+        System.setOut(new PrintStream(new OutputAreaWrapper(outputArea)));
+    }
+
+    public void resetOutputStream() {
+        System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));
     }
 
     /**
@@ -119,6 +128,9 @@ public class GUIController {
 
         // Clean VBox from previous errors
         errorVBox.getChildren().clear();
+
+        // Clean outputStream from previous results
+        outputArea.clear();
 
         Path filePath = Paths.get(scriptPath);
         try {
@@ -210,5 +222,23 @@ public class GUIController {
      */
     public void shutdownThreads() {
         EXECUTOR.shutdownNow();
+    }
+
+    private class OutputAreaWrapper extends OutputStream {
+        private final TextArea outputArea;
+
+        public OutputAreaWrapper(TextArea outputArea) {
+            this.outputArea = outputArea;
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            this.appendText(String.valueOf((char)b));
+        }
+
+        public void appendText(final String text) {
+            Platform.runLater(() -> outputArea.appendText(text));
+        }
+
     }
 }

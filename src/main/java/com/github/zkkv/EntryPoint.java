@@ -46,10 +46,12 @@ public class EntryPoint extends Application {
         String scriptPath = "src/main/java/com/github/zkkv/scripts/" + scriptName
                 + "." + scriptingStrategy.extension();
         GUIController controller = fxmlLoader.getController();
+
         controller.setScriptPath(scriptPath);
         controller.setService(service);
         controller.setScriptRunner(scriptRunner);
         controller.setScriptingStrategy(scriptingStrategy);
+        controller.setOutputStreamToGUI();
         controller.setupScene();
 
         primaryStage.setScene(scene);
@@ -58,7 +60,10 @@ public class EntryPoint extends Application {
         primaryStage.setMinWidth(620);
         primaryStage.setMinHeight(500);
         primaryStage.setTitle(scriptingStrategy.languageName() + ": Script Runner GUI");
-        primaryStage.setOnCloseRequest(event -> controller.shutdownThreads());
+        primaryStage.setOnCloseRequest(event -> {
+            controller.shutdownThreads();
+            controller.resetOutputStream();
+        });
         primaryStage.getIcons().add(new Image("file:src/main/resources/img/icon16.png"));
         primaryStage.getIcons().add(new Image("file:src/main/resources/img/icon32.png"));
         primaryStage.getIcons().add(new Image("file:src/main/resources/img/icon64.png"));
