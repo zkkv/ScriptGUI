@@ -3,12 +3,14 @@ package com.github.zkkv.controllers;
 import com.github.zkkv.SharedConstants;
 import com.github.zkkv.services.GUIService;
 import com.github.zkkv.services.ScriptRunner;
+import com.github.zkkv.strategies.ScriptingStrategy;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 
@@ -21,13 +23,15 @@ import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GUIController implements Initializable {
+public class GUIController {
 
     private GUIService service;
 
     private ScriptRunner scriptRunner;
 
     private SharedConstants constants;
+
+    private ScriptingStrategy scriptingStrategy;
 
     @FXML
     private SplitPane mainSplitPane;
@@ -57,8 +61,7 @@ public class GUIController implements Initializable {
 
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void setupScene() {
         outputArea.setEditable(false);
         outputArea.setWrapText(false);
         outputArea.replaceText(0, outputArea.getLength(), "Output will appear here");
@@ -66,7 +69,7 @@ public class GUIController implements Initializable {
         inputArea.setParagraphGraphicFactory(LineNumberFactory.get(inputArea));
         inputArea.setEditable(true);
         inputArea.setWrapText(false);
-        inputArea.replaceText(0, inputArea.getLength(), "var example = 42 * 3\nexample");
+        inputArea.replaceText(0, inputArea.getLength(), scriptingStrategy.exampleSnippet());
 
         // Restrict min and max values for the divider in SplitPane
         mainSplitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) -> {
@@ -98,6 +101,10 @@ public class GUIController implements Initializable {
         this.constants = constants;
     }
 
+    public void setScriptingStrategy(ScriptingStrategy scriptingStrategy) {
+        this.scriptingStrategy = scriptingStrategy;
+    }
+
     public void run() {
         // Block editing while the code is running
         inputArea.setEditable(false);
@@ -110,7 +117,8 @@ public class GUIController implements Initializable {
             service.saveCodeToFile(filepath, inputArea.getText());
         } catch (IOException e) {
             errorCodeLabel.setTextFill(Color.RED);
-            errorCodeLabel.setText("Something went wrong when trying to write to .kts file");
+            errorCodeLabel.setText("Something went wrong when trying to write to ."
+                    + scriptingStrategy.extension() + "file");
             inputArea.setEditable(true);
             return;
         }
@@ -120,7 +128,8 @@ public class GUIController implements Initializable {
             script = service.readCodeFromFile(filepath);
         } catch (IOException e) {
             errorCodeLabel.setTextFill(Color.RED);
-            errorCodeLabel.setText("Something went wrong when trying to write to .kts file");
+            errorCodeLabel.setText("Something went wrong when trying to write to ."
+                    + scriptingStrategy.extension() + "file");
             inputArea.setEditable(true);
             return;
         }
@@ -148,19 +157,16 @@ public class GUIController implements Initializable {
 
     private void handleScriptErrors(final String[] errorLines) {
         for (String errorLine : errorLines) {
-            // Extract line number and cursor position of the error
-            Matcher matcher = Pattern.compile(":(\\d+):(\\d+)").matcher(errorLine);
-            if (matcher.find()) {
-                int lineNumber = Integer.parseInt(matcher.group(1));
-                int cursorPosition = Integer.parseInt(matcher.group(2));
+            int[] lineAndColumn = scriptingStrategy.lineAndColumn(errorLine);
 
+            if (lineAndColumn != null) {
                 // Add hyperlink with error to the VBox
                 Hyperlink linkToError = new Hyperlink();
                 linkToError.setText(errorLine);
                 linkToError.setTextFill(Color.RED);
                 linkToError.setOnAction(event -> {
                     inputArea.requestFocus();
-                    inputArea.moveTo(lineNumber - 1, cursorPosition);
+                    inputArea.moveTo(lineAndColumn[0] - 1, lineAndColumn[1]);
                     inputArea.requestFollowCaret();
                     linkToError.setVisited(false);
                 });
