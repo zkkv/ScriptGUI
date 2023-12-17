@@ -80,9 +80,9 @@ public class GUIController implements Initializable {
         // Clean VBox from previous errors
         errorVBox.getChildren().clear();
 
-        Path savepath = Paths.get(constants.relativeScriptPath() + constants.scriptName());
+        Path filepath = Paths.get(constants.relativeScriptPath() + constants.scriptName());
         try {
-            service.saveCodeToFile(savepath, inputArea.getText());
+            service.saveCodeToFile(filepath, inputArea.getText());
         } catch (IOException e) {
             // TODO: Handle the exception nicely
             e.printStackTrace();
@@ -90,16 +90,22 @@ public class GUIController implements Initializable {
             return;
         }
 
+        String script;
+        try {
+            script = service.readCodeFromFile(filepath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Something went wrong when trying to read from .kts file.");
+            return;
+        }
+
         runningLabel.setText("Running the script");
         try {
-            Object result = scriptRunner.executeScript(constants);
+            Object result = scriptRunner.executeScript(script);
             runningLabel.setText("Execution has finished");
             if (result != null) {
                 outputArea.replaceText(0, outputArea.getLength(), result.toString());
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Something went wrong when trying to read from .kts file.");
         } catch (ScriptException e) {
             e.printStackTrace();
             String[] errorLines = e.getMessage().split(System.lineSeparator());
