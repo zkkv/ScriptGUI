@@ -57,6 +57,7 @@ public class EntryPoint extends Application {
         primaryStage.setMinWidth(620);
         primaryStage.setMinHeight(500);
         primaryStage.setTitle(scriptingStrategy.languageName() + ": Script Runner GUI");
+        primaryStage.setOnCloseRequest(event -> controller.shutdownThreads());
         primaryStage.show();
     }
 }

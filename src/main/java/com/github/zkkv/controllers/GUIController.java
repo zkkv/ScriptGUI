@@ -3,6 +3,8 @@ package com.github.zkkv.controllers;
 import com.github.zkkv.services.GUIService;
 import com.github.zkkv.services.ScriptRunner;
 import com.github.zkkv.strategies.ScriptingStrategy;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -10,10 +12,11 @@ import javafx.scene.paint.Color;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 
-import javax.script.ScriptException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Controls the only scene in the application.
@@ -27,6 +30,9 @@ public class GUIController {
     private String scriptPath;
 
     private ScriptingStrategy scriptingStrategy;
+
+    // Multithreading
+    private final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
 
     @FXML
     private SplitPane mainSplitPane;
@@ -136,19 +142,38 @@ public class GUIController {
             return;
         }
 
-        runningLabel.setText("Running the script");
-        try {
-            Object result = scriptRunner.executeScript(script);
-            handleSuccessfulExecution(result);
-        } catch (ScriptException e) {
-            String[] errorLines = e.getMessage().split("\n");
-            handleScriptErrors(errorLines);
-        }
-        // Unblock editing
-        inputArea.setEditable(true);
+        executeScriptOnDedicatedThread(script);
     }
 
-    private void handleSuccessfulExecution(Object result) {
+    private void executeScriptOnDedicatedThread(final String script) {
+        runningLabel.setText("Running the script");
+
+        // Create a Task to run the script on the background (not JavaFX) thread
+        Task<Object> scriptTask = new Task<>() {
+            @Override
+            protected Object call() throws Exception {
+                return scriptRunner.executeScript(script);
+            }
+        };
+
+        // Set up event handler for when the Task is finished.
+        // This is executed on JavaFX thread, unlike call().
+        scriptTask.setOnSucceeded((WorkerStateEvent event) -> {
+            Object result = scriptTask.getValue();
+            handleSuccessfulExecution(result);
+            inputArea.setEditable(true);
+        });
+
+        scriptTask.setOnFailed((WorkerStateEvent event) -> {
+            String[] errorLines = event.getSource().getException().getMessage().split("\n");
+            handleScriptErrors(errorLines);
+            inputArea.setEditable(true);
+        });
+
+        EXECUTOR.submit(scriptTask);
+    }
+
+    private void handleSuccessfulExecution(final Object result) {
         runningLabel.setText("Execution has finished successfully");
         errorCodeLabel.setTextFill(Color.BLACK);
         errorCodeLabel.setText("Exit code: 0");
@@ -178,5 +203,12 @@ public class GUIController {
         errorCodeLabel.setTextFill(Color.RED);
         errorCodeLabel.setText("Error(s) with script execution");
         runningLabel.setText("Execution has finished with error(s)");
+    }
+
+    /**
+     * Shuts down active threads.
+     */
+    public void shutdownThreads() {
+        EXECUTOR.shutdownNow();
     }
 }
