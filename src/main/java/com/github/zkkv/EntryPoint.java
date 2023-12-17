@@ -13,10 +13,24 @@ import javafx.stage.Stage;
 
 public class EntryPoint extends Application {
 
+    /**
+     * Launches JavaFX application.
+     *
+     * @param args arguments from {@link Main}.
+     */
     public static void main(String[] args) {
         launch();
     }
 
+    /**
+     * Sets up the stage, the controllers and all utility classes for the application.
+     *
+     * @param primaryStage the primary stage for this application, onto which
+     * the application scene can be set.
+     * Applications may create other stages, if needed, but they will not be
+     * primary stages.
+     * @throws Exception
+     */
     @Override
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/mainScene.fxml"));

@@ -23,6 +23,9 @@ import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Controls the only scene in the application.
+ */
 public class GUIController {
 
     private GUIService service;
@@ -61,6 +64,9 @@ public class GUIController {
 
     }
 
+    /**
+     * Sets up attributes and listeners for nodes in the scene.
+     */
     public void setupScene() {
         outputArea.setEditable(false);
         outputArea.setWrapText(false);
@@ -105,6 +111,10 @@ public class GUIController {
         this.scriptingStrategy = scriptingStrategy;
     }
 
+    /**
+     * Method is executed when the "Run" button in the GUI is pressed.
+     * Script is saved and executed, and the interface is updated accordingly.
+     */
     public void run() {
         // Block editing while the code is running
         inputArea.setEditable(false);
