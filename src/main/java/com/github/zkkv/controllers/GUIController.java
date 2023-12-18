@@ -206,7 +206,7 @@ public class GUIController {
         // Clean VBox from previous errors
         errorVBox.getChildren().clear();
 
-        // Clean outputStream from previous results
+        // Clean outputArea from previous results
         outputArea.clear();
     }
 
@@ -260,9 +260,7 @@ public class GUIController {
      */
     public void abort() {
         scriptTask.cancel();
-        inputArea.setEditable(true);
-        abortButton.setDisable(true);
-        runButton.setDisable(false);
+        executeOnRunFinish();
         runningLabel.setText("Execution was aborted");
     }
 
