@@ -9,7 +9,7 @@ public class Main {
      *
      * @param args CLI arguments
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         EntryPoint.main(args);
     }
 

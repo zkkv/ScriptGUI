@@ -35,7 +35,7 @@ public class GUIController {
     private Task<Object> scriptTask;
 
     // Multithreading
-    private final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
+    private final ExecutorService executor = Executors.newCachedThreadPool();
 
     @FXML
     private SplitPane mainSplitPane;
@@ -68,10 +68,16 @@ public class GUIController {
 
     }
 
+    /**
+     * Redirects the default System.out stream to GUI output area.
+     */
     public void setOutputStreamToGUI() {
         System.setOut(new PrintStream(new OutputAreaWrapper(outputArea)));
     }
 
+    /**
+     * Restores the System.out stream to its default value - FileDescriptor.out.
+     */
     public void resetOutputStream() {
         System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));
     }
@@ -93,7 +99,8 @@ public class GUIController {
         abortButton.setDisable(true);
 
         // Restrict min and max values for the divider in SplitPane
-        mainSplitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) -> {
+        mainSplitPane.getDividers().get(0).positionProperty()
+                .addListener((observable, oldValue, newValue) -> {
             if (newValue.doubleValue() < 0.2) {
                 mainSplitPane.getDividers().get(0).setPosition(0.2);
             } else if (newValue.doubleValue() > 0.8) {
@@ -101,7 +108,8 @@ public class GUIController {
             }
         });
 
-        outputSplitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) -> {
+        outputSplitPane.getDividers().get(0).positionProperty()
+                .addListener((observable, oldValue, newValue) -> {
             if (newValue.doubleValue() < 0.2) {
                 outputSplitPane.getDividers().get(0).setPosition(0.2);
             } else if (newValue.doubleValue() > 0.8) {
@@ -110,19 +118,19 @@ public class GUIController {
         });
     }
 
-    public void setService(GUIService service) {
+    public void setService(final GUIService service) {
         this.service = service;
     }
 
-    public void setScriptRunner(ScriptRunner scriptRunner) {
+    public void setScriptRunner(final ScriptRunner scriptRunner) {
         this.scriptRunner = scriptRunner;
     }
 
-    public void setScriptPath(String scriptPath) {
+    public void setScriptPath(final String scriptPath) {
         this.scriptPath = scriptPath;
     }
 
-    public void setScriptingStrategy(ScriptingStrategy scriptingStrategy) {
+    public void setScriptingStrategy(final ScriptingStrategy scriptingStrategy) {
         this.scriptingStrategy = scriptingStrategy;
     }
 
@@ -156,7 +164,7 @@ public class GUIController {
         }
 
         runningLabel.setText("Running the script (editing is disabled)");
-        EXECUTOR.submit(initializeScriptTask(script));
+        executor.submit(initializeScriptTask(script));
     }
 
     private Task<Object> initializeScriptTask(final String script) {
@@ -248,19 +256,19 @@ public class GUIController {
      * Shuts down active threads.
      */
     public void shutdownThreads() {
-        EXECUTOR.shutdownNow();
+        executor.shutdownNow();
     }
 
     private class OutputAreaWrapper extends OutputStream {
         private final TextArea outputArea;
 
-        public OutputAreaWrapper(TextArea outputArea) {
+        OutputAreaWrapper(final TextArea outputArea) {
             this.outputArea = outputArea;
         }
 
         @Override
-        public void write(int b) throws IOException {
-            Platform.runLater(() -> outputArea.appendText(String.valueOf((char)b)));
+        public void write(final int b) throws IOException {
+            Platform.runLater(() -> outputArea.appendText(String.valueOf((char) b)));
         }
     }
 }

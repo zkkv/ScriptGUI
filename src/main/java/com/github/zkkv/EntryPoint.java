@@ -19,7 +19,7 @@ public class EntryPoint extends Application {
      *
      * @param args arguments from {@link Main}.
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         launch();
     }
 
@@ -33,7 +33,7 @@ public class EntryPoint extends Application {
      * @throws Exception
      */
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(final Stage primaryStage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/mainScene.fxml"));
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root);

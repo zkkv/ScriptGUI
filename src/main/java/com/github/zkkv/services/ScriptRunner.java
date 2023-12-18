@@ -19,7 +19,7 @@ public class ScriptRunner {
      *
      * @param scriptingStrategy the scripting strategy to use for execution of the scripts.
      */
-    public ScriptRunner(ScriptingStrategy scriptingStrategy) {
+    public ScriptRunner(final ScriptingStrategy scriptingStrategy) {
         engine = new ScriptEngineManager().getEngineByExtension(scriptingStrategy.extension());
     }
 

@@ -31,8 +31,9 @@ public interface ScriptingStrategy {
      * where the error in {@code errorLine} occurred.
      *
      * @param errorLine error string which contains the line and column numbers of the error.
-     * @return array of size 2 that contains the line number at index 0 and column number at index 1,
-     * if it was possible to find the two in the {@code errorLine}. Otherwise, {@code null}.
+     * @return array of size 2 that contains the line number at index 0 and
+     * column number at index 1, if it was possible to find the two in the {@code errorLine}.
+     * Otherwise, {@code null}.
      */
-    int[] lineAndColumn(final String errorLine);
+    int[] lineAndColumn(String errorLine);
 }
