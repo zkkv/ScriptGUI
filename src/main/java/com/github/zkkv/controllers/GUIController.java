@@ -211,7 +211,7 @@ public class GUIController {
         } catch (IOException e) {
             errorCodeLabel.setTextFill(Color.RED);
             errorCodeLabel.setText("Something went wrong when trying to write to ."
-                    + scriptingStrategy.extension() + "file");
+                    + scriptingStrategy.extension() + " file");
             executeOnRunFinish();
             return;
         }
@@ -222,7 +222,7 @@ public class GUIController {
         } catch (IOException e) {
             errorCodeLabel.setTextFill(Color.RED);
             errorCodeLabel.setText("Something went wrong when trying to write to ."
-                    + scriptingStrategy.extension() + "file");
+                    + scriptingStrategy.extension() + " file");
             executeOnRunFinish();
             return;
         }
