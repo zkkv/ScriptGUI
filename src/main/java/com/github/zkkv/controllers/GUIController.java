@@ -234,8 +234,6 @@ public class GUIController {
                 Hyperlink linkToError = new Hyperlink();
                 linkToError.setText(errorLine);
 
-                System.err.println(errorLine);
-
                 if (scriptingStrategy.isError(errorLine)) {
                     linkToError.setTextFill(Color.RED);
                 } else if (scriptingStrategy.isWarning(errorLine)) {
