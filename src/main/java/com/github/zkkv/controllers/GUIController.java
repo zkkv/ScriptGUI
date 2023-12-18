@@ -99,21 +99,25 @@ public class GUIController {
         abortButton.setDisable(true);
 
         // Restrict min and max values for the divider in SplitPane
+        double minMainPane = 0.2;
+        double maxMainPane = 0.8;
+        double minOutputPane = 0.2;
+        double maxOutputPane = 0.8;
         mainSplitPane.getDividers().get(0).positionProperty()
                 .addListener((observable, oldValue, newValue) -> {
-            if (newValue.doubleValue() < 0.2) {
-                mainSplitPane.getDividers().get(0).setPosition(0.2);
-            } else if (newValue.doubleValue() > 0.8) {
-                mainSplitPane.getDividers().get(0).setPosition(0.8);
+            if (newValue.doubleValue() < minMainPane) {
+                mainSplitPane.getDividers().get(0).setPosition(minMainPane);
+            } else if (newValue.doubleValue() > maxMainPane) {
+                mainSplitPane.getDividers().get(0).setPosition(maxMainPane);
             }
         });
 
         outputSplitPane.getDividers().get(0).positionProperty()
                 .addListener((observable, oldValue, newValue) -> {
-            if (newValue.doubleValue() < 0.2) {
-                outputSplitPane.getDividers().get(0).setPosition(0.2);
-            } else if (newValue.doubleValue() > 0.8) {
-                outputSplitPane.getDividers().get(0).setPosition(0.8);
+            if (newValue.doubleValue() < minOutputPane) {
+                outputSplitPane.getDividers().get(0).setPosition(minOutputPane);
+            } else if (newValue.doubleValue() > maxOutputPane) {
+                outputSplitPane.getDividers().get(0).setPosition(maxOutputPane);
             }
         });
     }
