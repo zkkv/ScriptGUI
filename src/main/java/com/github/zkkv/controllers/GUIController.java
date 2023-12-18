@@ -89,6 +89,22 @@ public class GUIController {
         System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));
     }
 
+    public void setService(final GUIService service) {
+        this.service = service;
+    }
+
+    public void setScriptRunner(final ScriptRunner scriptRunner) {
+        this.scriptRunner = scriptRunner;
+    }
+
+    public void setScriptPath(final String scriptPath) {
+        this.scriptPath = scriptPath;
+    }
+
+    public void setScriptingStrategy(final ScriptingStrategy scriptingStrategy) {
+        this.scriptingStrategy = scriptingStrategy;
+    }
+
     /**
      * Sets up attributes and listeners for nodes in the scene.
      */
@@ -180,22 +196,6 @@ public class GUIController {
         }
         spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
         return spansBuilder.create();
-    }
-
-    public void setService(final GUIService service) {
-        this.service = service;
-    }
-
-    public void setScriptRunner(final ScriptRunner scriptRunner) {
-        this.scriptRunner = scriptRunner;
-    }
-
-    public void setScriptPath(final String scriptPath) {
-        this.scriptPath = scriptPath;
-    }
-
-    public void setScriptingStrategy(final ScriptingStrategy scriptingStrategy) {
-        this.scriptingStrategy = scriptingStrategy;
     }
 
     /**
