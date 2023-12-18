@@ -39,6 +39,13 @@ public class KotlinScriptingStrategy implements ScriptingStrategy {
         return """
                 fun foo(): Int {
                     var x = 42 * 3
+                    for (i in 1..10000) {
+                        println(i)
+                        if (i == 12345) {
+                            break
+                        }
+                        Thread.sleep(100)
+                    }
                     return x
                 }
                 foo()

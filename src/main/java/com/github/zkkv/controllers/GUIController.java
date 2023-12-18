@@ -111,7 +111,7 @@ public class GUIController {
     public void setupScene() {
         outputArea.setEditable(false);
         outputArea.setWrapText(false);
-        outputArea.replaceText(0, outputArea.getLength(), "Output will appear here");
+        outputArea.setText("Output will appear here");
 
         inputArea.setParagraphGraphicFactory(LineNumberFactory.get(inputArea));
         inputArea.setEditable(true);
@@ -281,7 +281,7 @@ public class GUIController {
         errorCodeLabel.setTextFill(Color.BLACK);
         errorCodeLabel.setText("Exit code: 0");
         if (result != null) {
-            outputArea.replaceText(0, outputArea.getLength(), result.toString());
+            outputArea.appendText("SCRIPT RESULT: " + result.toString());
         }
     }
 
