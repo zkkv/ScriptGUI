@@ -1,7 +1,7 @@
 # ScriptGUI Application
 
 ## Description
-A window application that allows to write and execute scripts, and then see the result of the execution in real time.
+A window application that allows users to write and execute scripts, and then see the result of the execution in real time.
 
 ## Details
 - Graphical interface is made with JavaFX.
