@@ -6,9 +6,10 @@ A window application that allows users to write and execute scripts, and then se
 ## Details
 - Graphical interface is made with JavaFX.
 - Scripts are run using JavaX package.
-- Application currently allows to use Kotlin as a scripting language but other languages can be added easily later on.
-- ScriptGUI allows to click on the errors to get to the place in source code where they appear.
-- Script can be aborted at any time.
+- Application currently allows using Kotlin as a scripting language but other languages can be added easily later on.
+- Users can click on errors to get to the place in the script source code where they appear.
+- Keywords of the scripting language are highlighted in the editor pane.
+- Execution of a script can be stopped at any time.
 - The result of the execution is shown in the output pane in real time.
 
 ## How to Build
