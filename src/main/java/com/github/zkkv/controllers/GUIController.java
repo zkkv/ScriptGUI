@@ -12,12 +12,19 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
+import org.fxmisc.richtext.model.StyleSpans;
+import org.fxmisc.richtext.model.StyleSpansBuilder;
 
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
 
 /**
  * Controls the only scene in the application.
@@ -120,6 +127,59 @@ public class GUIController {
                 outputSplitPane.getDividers().get(0).setPosition(maxOutputPane);
             }
         });
+
+        applyHighlighting(computeHighlighting(inputArea.getText()));
+
+        // 1. Detect changes in the input area.
+        // 2. Multiple changes within 250 ms window are considered a single event.
+        // 3. Only consider the last event as it's the only one that matters.
+        // 4. For each event call createHighlightingTask() method.
+        // 5. Wait for the highlighting task to complete before proceeding.
+        // 6. For each successful task return the result.
+        // 7. For each successful event applyHighlighting to the result.
+        inputArea.multiPlainChanges()
+                .successionEnds(Duration.ofMillis(250))
+                .retainLatestUntilLater()
+                .supplyTask(this::createHighlightingTask)
+                .awaitLatest(inputArea.multiPlainChanges())
+                .filterMap(attempt -> {
+                    if (attempt.isSuccess()) {
+                        return Optional.of(attempt.get());
+                    } else {
+                        return Optional.empty();
+                    }
+                })
+                .subscribe(this::applyHighlighting);
+    }
+
+    private Task<StyleSpans<Collection<String>>> createHighlightingTask() {
+        Task<StyleSpans<Collection<String>>> task = new Task<>() {
+            @Override
+            protected StyleSpans<Collection<String>> call() {
+                return computeHighlighting(inputArea.getText());
+            }
+        };
+        executor.submit(task);
+        return task;
+    }
+
+    private void applyHighlighting(final StyleSpans<Collection<String>> highlighting) {
+        inputArea.setStyleSpans(0, highlighting);
+    }
+
+    private StyleSpans<Collection<String>> computeHighlighting(final String text) {
+        Matcher matcher = scriptingStrategy.keywordPattern().matcher(text);
+        int lastKwEnd = 0;
+        StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
+        while (matcher.find()) {
+            // No style group for non-matched parts
+            spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
+            // Chosen style group for matched parts
+            spansBuilder.add(Collections.singleton("keyword"), matcher.end() - matcher.start());
+            lastKwEnd = matcher.end();
+        }
+        spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
+        return spansBuilder.create();
     }
 
     public void setService(final GUIService service) {

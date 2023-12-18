@@ -42,6 +42,8 @@ public class EntryPoint extends Application {
         GUIService service = new GUIService();
         ScriptRunner scriptRunner = new ScriptRunner(scriptingStrategy);
 
+        scene.getStylesheets().add(getClass().getResource("/keywords.css").toExternalForm());
+
         String scriptName = "script";
         String scriptPath = "src/main/java/com/github/zkkv/scripts/" + scriptName
                 + "." + scriptingStrategy.extension();

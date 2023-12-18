@@ -8,6 +8,13 @@ import java.util.regex.Pattern;
  */
 public class KotlinScriptingStrategy implements ScriptingStrategy {
 
+    public static final String[] KEYWORDS = new String[] {
+            "as", "break", "class", "continue", "do", "else", "false", "for",
+            "fun", "if", "in", "interface", "is", "null", "object", "package",
+            "return", "super", "this", "throw", "true", "try", "typealias",
+            "typeof", "val", "var", "when", "while"
+    };
+
     /**
      * See {@link ScriptingStrategy#languageName()}.
      */
@@ -68,5 +75,13 @@ public class KotlinScriptingStrategy implements ScriptingStrategy {
     @Override
     public boolean isWarning(final String errorLine) {
         return Pattern.compile("(WARNING)").matcher(errorLine).find();
+    }
+
+    /**
+     * See {@link ScriptingStrategy#keywordPattern()}.
+     */
+    @Override
+    public Pattern keywordPattern() {
+        return Pattern.compile("\\b(" + String.join("|", KEYWORDS) + ")\\b");
     }
 }

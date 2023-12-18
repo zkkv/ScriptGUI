@@ -1,5 +1,7 @@
 package com.github.zkkv.strategies;
 
+import java.util.regex.Pattern;
+
 /**
  * Defines an interface for a set of scripting languages.
  */
@@ -52,4 +54,11 @@ public interface ScriptingStrategy {
      * @return {@code true} if the message is a warning and {@code false} otherwise.
      */
     boolean isWarning(String errorLine);
+
+    /**
+     * Returns a pattern matching language keywords.
+     *
+     * @return a pattern matching language keywords.
+     */
+    Pattern keywordPattern();
 }
