@@ -233,7 +233,15 @@ public class GUIController {
                 // Add hyperlink with error to the VBox
                 Hyperlink linkToError = new Hyperlink();
                 linkToError.setText(errorLine);
-                linkToError.setTextFill(Color.RED);
+
+                System.err.println(errorLine);
+
+                if (scriptingStrategy.isError(errorLine)) {
+                    linkToError.setTextFill(Color.RED);
+                } else if (scriptingStrategy.isWarning(errorLine)) {
+                    linkToError.setTextFill(Color.web("#b29518"));
+                }
+
                 linkToError.setOnAction(event -> {
                     inputArea.requestFocus();
                     inputArea.moveTo(lineAndColumn[0] - 1, lineAndColumn[1]);
@@ -248,6 +256,10 @@ public class GUIController {
         runningLabel.setText("Execution has finished with error(s)");
     }
 
+    /**
+     * Method is executed when the "Abort" button in the GUI is pressed. Execution of the
+     * currently running script is stopped.
+     */
     public void abort() {
         scriptTask.cancel();
         inputArea.setEditable(true);

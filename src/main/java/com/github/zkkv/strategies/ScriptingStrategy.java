@@ -36,4 +36,20 @@ public interface ScriptingStrategy {
      * Otherwise, {@code null}.
      */
     int[] lineAndColumn(String errorLine);
+
+    /**
+     * Returns {@code true} if the {@code errorLine} is an error and {@code false} otherwise.
+     *
+     * @param errorLine string with a message
+     * @return {@code true} if the message is an error and {@code false} otherwise.
+     */
+    boolean isError(String errorLine);
+
+    /**
+     * Returns {@code true} if the {@code errorLine} is a warning and {@code false} otherwise.
+     *
+     * @param errorLine string with a message
+     * @return {@code true} if the message is a warning and {@code false} otherwise.
+     */
+    boolean isWarning(String errorLine);
 }

@@ -53,4 +53,20 @@ public class KotlinScriptingStrategy implements ScriptingStrategy {
         int columnNumber = Integer.parseInt(matcher.group(2));
         return new int[] {lineNumber, columnNumber};
     }
+
+    /**
+     * See {@link ScriptingStrategy#isError(String)}.
+     */
+    @Override
+    public boolean isError(final String errorLine) {
+        return Pattern.compile("(ERROR)").matcher(errorLine).find();
+    }
+
+    /**
+     * See {@link ScriptingStrategy#isWarning(String)}.
+     */
+    @Override
+    public boolean isWarning(final String errorLine) {
+        return Pattern.compile("(WARNING)").matcher(errorLine).find();
+    }
 }
